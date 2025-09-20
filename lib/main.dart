@@ -60,10 +60,10 @@ class _MyHomePageState extends State<MyHomePage> {
   int age = 21;
   String option = "Obvio";
 
-  final List<String> students = ["Alan", "Daniel", "Alberto", "Kevin"];
-  final Student student = Student("I20223TN018", "Alan", 21);
-
-  TextEditingController _TxtName = TextEditingController();
+  final List<Student> students = [];
+  TextEditingController _txtName = TextEditingController();
+  TextEditingController _txtStudentId = TextEditingController();
+  TextEditingController _txtAge = TextEditingController();
   
   void _incrementCounter() {
     setState(() {
@@ -84,25 +84,47 @@ class _MyHomePageState extends State<MyHomePage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 12,),
-        Text("Students list: "),
+        Text("Students list: ", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         SizedBox(height: 12,),
-        ...students.map((n) => Text("- $n")).toList(),
+        ...students.map((student) => Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Name: ${student.name}"),
+                Text("ID: ${student.studentId}"),
+                Text("Age: ${student.age}"),
+              ],
+            ),
+          ),
+        )).toList(),
       ],
-    ); //Column
+    );
   }
 
   void _addStudent(){
-    final name = _TxtName.text.trim();
-    if(name.isNotEmpty){
+    final name = _txtName.text.trim();
+    final studentId = _txtStudentId.text.trim();
+    final age = int.tryParse(_txtAge.text.trim()) ?? 0;
+
+    if(name.isEmpty || studentId.isEmpty || age == 0){
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Student added: $name"))
+        SnackBar(content: Text("Please fill all fields correctly"))
       );
       return;
     }
+
     setState(() {
-      students.add(name);
-      _TxtName.clear();
+      students.add(Student(studentId, name, age));
+      _txtName.clear();
+      _txtStudentId.clear();
+      _txtAge.clear();
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Student added successfully"))
+    );
   }
 
   @override
@@ -144,32 +166,56 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             
             const Text('Use buttons below to change the counter:'),
-            
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            Padding(padding: EdgeInsets.symmetric(horizontal: 12),
-            child: TextField(
-              controller: _TxtName,
-              decoration: InputDecoration(
-                labelText: "Name: ",
-                border: OutlineInputBorder(), 
-              ),
-            ),
-            ),
-            Padding(padding: EdgeInsets.symmetric(horizontal: 12),
-            child: ElevatedButton(onPressed: _addStudent, child: Text("Add Student"))),
-
             SizedBox(height: 15),
             Text('Nombre:  $name'),
             Text('Edad:  $age'),
             Text('Soy bueno pa la chamba?  $option'),
+            SizedBox(height: 20),
+            const Text('Add new student:'),
+            SizedBox(height: 20),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: TextField(
+                controller: _txtName,
+                decoration: InputDecoration(
+                  labelText: "Name",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: TextField(
+                controller: _txtStudentId,
+                decoration: InputDecoration(
+                  labelText: "Student ID",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: TextField(
+                controller: _txtAge,
+                decoration: InputDecoration(
+                  labelText: "Age",
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ),
             SizedBox(height: 15),
-            Text('Student info: '),
-            Text('- Name: ${student.name}'),
-            Text('- Student ID: ${student.studentId}'),
-            Text('- Age: ${student.age}'),
+            ElevatedButton(
+              onPressed: _addStudent,
+              child: Text("Add Student")
+            ),
+            SizedBox(height: 20),
             _getAllStudents(),
           ],
         ),
