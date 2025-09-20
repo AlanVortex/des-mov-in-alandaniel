@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_proyecto1/Student.dart';
 
 void main() {
   runApp(const MyApp());
@@ -59,27 +60,48 @@ class _MyHomePageState extends State<MyHomePage> {
   int age = 21;
   String option = "Obvio";
 
+  final List<String> students = ["Alan", "Daniel", "Alberto", "Kevin"];
+  final Student student = Student("I20223TN018", "Alan", 21);
+
+  TextEditingController _TxtName = TextEditingController();
+  
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
 
   void _decrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       if (_counter > 0) {
         _counter--;
       }
+    });
+  }
+
+  Widget _getAllStudents(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12,),
+        Text("Students list: "),
+        SizedBox(height: 12,),
+        ...students.map((n) => Text("- $n")).toList(),
+      ],
+    ); //Column
+  }
+
+  void _addStudent(){
+    final name = _TxtName.text.trim();
+    if(name.isNotEmpty){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Student added: $name"))
+      );
+      return;
+    }
+    setState(() {
+      students.add(name);
+      _TxtName.clear();
     });
   }
 
@@ -120,15 +142,35 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            
             const Text('Use buttons below to change the counter:'),
+            
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 12),
+            child: TextField(
+              controller: _TxtName,
+              decoration: InputDecoration(
+                labelText: "Name: ",
+                border: OutlineInputBorder(), 
+              ),
+            ),
+            ),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 12),
+            child: ElevatedButton(onPressed: _addStudent, child: Text("Add Student"))),
+
             SizedBox(height: 15),
             Text('Nombre:  $name'),
             Text('Edad:  $age'),
             Text('Soy bueno pa la chamba?  $option'),
+            SizedBox(height: 15),
+            Text('Student info: '),
+            Text('- Name: ${student.name}'),
+            Text('- Student ID: ${student.studentId}'),
+            Text('- Age: ${student.age}'),
+            _getAllStudents(),
           ],
         ),
       ),
